@@ -1,0 +1,7 @@
+environment           = "sample-customer-env"
+region                = "us-east-1"
+vpc_cidr              = "10.0.0.0/16"
+rest_api_service_name = "com.amazonaws.vpce.us-east-1.vpce-svc-0482ba3684568f649"
+grpc_api_service_name = "com.amazonaws.vpce.us-east-1.vpce-svc-06281562655dba24b"
+enable_bastion        = true
+enable_sample_vm      = true

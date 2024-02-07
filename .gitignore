@@ -1,0 +1,10 @@
+.terraform
+.idea
+.run
+.env
+bin
+builds
+
+*.iml
+*.tfvars
+*.tfstate
