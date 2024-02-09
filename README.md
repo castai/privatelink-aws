@@ -24,8 +24,15 @@ to communicate with the central system.
 ### VPC Services
 
 Two VPC endpoints (one for REST API traffic and one for gRPC traffic) must be created in a given VPC to allow access to
-the central CAST AI system. Check out provided Terraform code for more details. Contact CAST AI to get specific service
-names as they are different per each AWS Region.
+the central CAST AI system. Check out provided Terraform code for more details. Here is a list of VPC endpoints' names per
+supported region (please contact CAST AI if in doubts):
+
+| Region                              | VPC Endpoint                                                                                                                                    |
+|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| US East (N. Virginia) us-east-1     | REST API: `com.amazonaws.vpce.us-east-1.vpce-svc-0f648001d494b9a46` </br> gRPC API: `com.amazonaws.vpce.us-east-1.vpce-svc-0f648001d494b9a46`   |
+| US East (Ohio) us-east-2            | REST API: `com.amazonaws.vpce.us-east-2.vpce-svc-0504dcd21f12037fe` </br> gRPC API: `com.amazonaws.vpce.us-east-2.vpce-svc-0681d838ee3b5e496`   |
+| Asia Pacific (Mumbai) ap-south-1    | REST API: `com.amazonaws.vpce.ap-south-1.vpce-svc-07c813d8840493bcf` </br> gRPC API: `com.amazonaws.vpce.ap-south-1.vpce-svc-028ad7f3e7879c47c` |
+| Asia Pacific (Hyderabad) ap-south-2 | REST API: `com.amazonaws.vpce.ap-south-2.vpce-svc-0a2a5307bb44fab88` </br> gRPC API: `com.amazonaws.vpce.ap-south-2.vpce-svc-00d1d87c025531c96` |
 
 ## EKS Cluster
 
