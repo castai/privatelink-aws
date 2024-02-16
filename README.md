@@ -2,6 +2,8 @@
 # About This Repository
 
 This repository provides some guidance and other means to help customers using CAST AI PrivateLink capability on AWS.
+The following diagram depicts components that implement this capability:
+![Screenshot](AWSPrivateLink.png)
 
 # Prerequisites
 
