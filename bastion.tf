@@ -128,10 +128,9 @@ module "bastion_user" {
   force_destroy                 = true
 }
 
-resource "aws_security_group" "bastion" {
-  count       = var.enable_bastion ? 1 : 0
-  name        = "${local.bastion_name}-ssm"
-  description = "VPC endpoints"
+resource "aws_security_group" "ssm_traffic" {
+  name        = "${local.vpc_name}-ssm"
+  description = "SSM traffic"
   vpc_id      = module.vpc.vpc_id
 
   tags = {
@@ -139,12 +138,10 @@ resource "aws_security_group" "bastion" {
   }
 }
 
-resource "aws_security_group_rule" "bastion_ingress_ssm" {
-  count = var.enable_bastion ? 1 : 0
-
-  security_group_id = aws_security_group.bastion[0].id
+resource "aws_security_group_rule" "ssm_traffic" {
+  security_group_id = aws_security_group.ssm_traffic.id
   type              = "ingress"
-  description       = "allow HTTPS traffic from AWS"
+  description       = "HTTPS traffic"
   protocol          = "tcp"
   cidr_blocks       = module.vpc.private_subnets_cidr_blocks
   from_port         = 443
@@ -156,7 +153,7 @@ resource "aws_vpc_endpoint" "endpoints" {
 
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.vpc.private_subnets
-  security_group_ids = [aws_security_group.bastion[0].id]
+  security_group_ids = [aws_security_group.ssm_traffic.id]
 
   service_name        = "com.amazonaws.${var.region}.${each.key}"
   vpc_endpoint_type   = "Interface"
