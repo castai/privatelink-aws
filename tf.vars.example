@@ -1,7 +1,8 @@
 environment           = "sample-customer-env"
-region                = "us-east-1"
-vpc_cidr              = "10.0.0.0/16"
-rest_api_service_name = "com.amazonaws.vpce.us-east-1.vpce-svc-0482ba3684568f649"
-grpc_api_service_name = "com.amazonaws.vpce.us-east-1.vpce-svc-06281562655dba24b"
-enable_bastion        = true
+region                = "ap-south-1"
+rest_api_service_name = "com.amazonaws.vpce.ap-south-1.vpce-svc-07c813d8840493bcf"
+grpc_api_service_name = "com.amazonaws.vpce.ap-south-1.vpce-svc-028ad7f3e7879c47c"
+vpc_id                = "vpc-07707ee4f46a88a53"
+enable_bastion        = false
 enable_sample_vm      = true
+sample_vm_subnet_id   = "subnet-094258769470dc479"
