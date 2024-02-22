@@ -30,14 +30,14 @@ data "aws_ami" "amazon_linux" {
 resource "aws_security_group" "sample_vm_sg" {
   count  = var.enable_sample_vm ? 1 : 0
   name   = "SG used for sample VMs"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
 
   ingress {
     description = "SSH access to sample VMs"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = module.vpc.private_subnets_cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"] #module.vpc.private_subnets_cidr_blocks
   }
 
   egress {
@@ -52,7 +52,7 @@ resource "aws_security_group" "sample_vm_sg" {
 
 resource "aws_network_interface" "sample_vm_eni" {
   count           = var.enable_sample_vm ? 1 : 0
-  subnet_id       = module.vpc.private_subnets[0]
+  subnet_id       = var.sample_vm_subnet_id == "" ? data.aws_subnets.private.ids[0] : var.sample_vm_subnet_id
   security_groups = [aws_security_group.sample_vm_sg[0].id]
 
   tags = {
@@ -115,4 +115,8 @@ resource "aws_instance" "sample_vm" {
     Name = local.vm_name
     "env" : var.environment
   }
+
+  depends_on = [
+    module.vpc
+  ]
 }

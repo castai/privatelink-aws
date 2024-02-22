@@ -87,8 +87,8 @@ module "bastion_host" {
   version = "2.5.0"
   count   = var.enable_bastion ? 1 : 0
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  vpc_id     = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
+  subnet_ids = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
 
   iam_role_path = "/${local.bastion_name}/"
   iam_user_arns = [module.bastion_user[0].iam_user_arn]
@@ -131,7 +131,7 @@ module "bastion_user" {
 resource "aws_security_group" "ssm_traffic" {
   name        = "${local.vpc_name}-ssm"
   description = "SSM traffic"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
 
   tags = {
     Name = "ssm"
@@ -143,7 +143,7 @@ resource "aws_security_group_rule" "ssm_traffic" {
   type              = "ingress"
   description       = "HTTPS traffic"
   protocol          = "tcp"
-  cidr_blocks       = module.vpc.private_subnets_cidr_blocks
+  cidr_blocks       = ["0.0.0.0/0"] #module.vpc.private_subnets_cidr_blocks
   from_port         = 443
   to_port           = 443
 }
@@ -151,8 +151,8 @@ resource "aws_security_group_rule" "ssm_traffic" {
 resource "aws_vpc_endpoint" "endpoints" {
   for_each = toset(["ssm", "ssmmessages", "ec2messages"])
 
-  vpc_id             = module.vpc.vpc_id
-  subnet_ids         = module.vpc.private_subnets
+  vpc_id             = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
+  subnet_ids         = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
   security_group_ids = [aws_security_group.ssm_traffic.id]
 
   service_name        = "com.amazonaws.${var.region}.${each.key}"

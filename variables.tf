@@ -30,6 +30,12 @@ variable "grpc_api_service_name" {
   description = "DNS name that will be used for accessing the VPC endpoint service provided by CAST AI from different account."
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "VPC id to use; a new will be created if not provided"
+  default     = ""
+}
+
 variable "enable_bastion" {
   type        = bool
   description = "Enable bastion to access private subnets"
@@ -40,4 +46,10 @@ variable "enable_sample_vm" {
   type        = bool
   description = "Enable sample VM"
   default     = false
+}
+
+variable "sample_vm_subnet_id" {
+  type        = string
+  description = "Subnet ID where sample VM will be placed"
+  default     = ""
 }
