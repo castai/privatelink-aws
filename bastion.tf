@@ -88,7 +88,7 @@ module "bastion_host" {
   count   = var.enable_bastion ? 1 : 0
 
   vpc_id     = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
-  subnet_ids = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
+  subnet_ids = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
 
   iam_role_path = "/${local.bastion_name}/"
   iam_user_arns = [module.bastion_user[0].iam_user_arn]
@@ -152,7 +152,7 @@ resource "aws_vpc_endpoint" "endpoints" {
   for_each = toset(["ssm", "ssmmessages", "ec2messages"])
 
   vpc_id             = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
-  subnet_ids         = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
+  subnet_ids         = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
   security_group_ids = [aws_security_group.ssm_traffic.id]
 
   service_name        = "com.amazonaws.${var.region}.${each.key}"

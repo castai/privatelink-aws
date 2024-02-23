@@ -52,7 +52,7 @@ resource "aws_security_group" "sample_vm_sg" {
 
 resource "aws_network_interface" "sample_vm_eni" {
   count           = var.enable_sample_vm ? 1 : 0
-  subnet_id       = var.sample_vm_subnet_id == "" ? data.aws_subnets.private.ids[0] : var.sample_vm_subnet_id
+  subnet_id       = var.sample_vm_subnet_id == "" ? module.vpc[0].private_subnets[0] : var.sample_vm_subnet_id
   security_groups = [aws_security_group.sample_vm_sg[0].id]
 
   tags = {

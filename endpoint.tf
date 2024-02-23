@@ -20,7 +20,7 @@ resource "aws_vpc_endpoint" "cast_ai_rest_api" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.rest_api_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "cast_ai_grpc_api" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.grpc_api_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.vpc_id == "" ? module.vpc.private_subnets : data.aws_subnets.private.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
