@@ -22,12 +22,22 @@ variable "vpc_cidr" {
 
 variable "rest_api_service_name" {
   type        = string
-  description = "DNS name that will be used for accessing the VPC endpoint service provided by CAST AI from different account."
+  description = "Service name used to access REST API"
 }
 
-variable "grpc_api_service_name" {
+variable "grpc_service_name" {
   type        = string
-  description = "DNS name that will be used for accessing the VPC endpoint service provided by CAST AI from different account."
+  description = "Service name used to access gRPC pod pinning API"
+}
+
+variable "api_grpc_service_name" {
+  type        = string
+  description = "Service name used to access API via gRPC"
+}
+
+variable "files_service_name" {
+  type        = string
+  description = "Service name used to download artifacts"
 }
 
 variable "vpc_id" {

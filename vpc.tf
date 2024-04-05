@@ -23,6 +23,6 @@ module "vpc" {
 data "aws_subnets" "all_vpc_subnets" {
   filter {
     name   = "vpc-id"
-    values = ["vpc-07707ee4f46a88a53"]
+    values = [var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id]
   }
 }
