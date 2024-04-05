@@ -127,39 +127,3 @@ module "bastion_user" {
   create_iam_user_login_profile = false
   force_destroy                 = true
 }
-
-resource "aws_security_group" "ssm_traffic" {
-  name        = "${local.vpc_name}-ssm"
-  description = "SSM traffic"
-  vpc_id      = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
-
-  tags = {
-    Name = "ssm"
-  }
-}
-
-resource "aws_security_group_rule" "ssm_traffic" {
-  security_group_id = aws_security_group.ssm_traffic.id
-  type              = "ingress"
-  description       = "HTTPS traffic"
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"] #module.vpc.private_subnets_cidr_blocks
-  from_port         = 443
-  to_port           = 443
-}
-
-resource "aws_vpc_endpoint" "endpoints" {
-  for_each = toset(["ssm", "ssmmessages", "ec2messages"])
-
-  vpc_id             = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
-  subnet_ids         = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
-  security_group_ids = [aws_security_group.ssm_traffic.id]
-
-  service_name        = "com.amazonaws.${var.region}.${each.key}"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-
-  tags = {
-    Name = "${local.bastion_name}-${each.key}"
-  }
-}
