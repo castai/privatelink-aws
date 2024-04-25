@@ -1,7 +1,9 @@
 environment           = "sample-customer-env"
 region                = "ap-south-1"
 rest_api_service_name = "com.amazonaws.vpce.ap-south-1.vpce-svc-07c813d8840493bcf"
-grpc_api_service_name = "com.amazonaws.vpce.ap-south-1.vpce-svc-028ad7f3e7879c47c"
+grpc_service_name     = "com.amazonaws.vpce.ap-south-1.vpce-svc-028ad7f3e7879c47c"
+api_grpc_service_name = "com.amazonaws.vpce.ap-south-1.vpce-svc-0dd30c956893d640e"
+files_service_name    = "com.amazonaws.vpce.ap-south-1.vpce-svc-0c4777e1cc92bf8a8"
 vpc_id                = "vpc-07707ee4f46a88a53"
 enable_bastion        = false
 enable_sample_vm      = true
