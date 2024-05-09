@@ -76,4 +76,15 @@ entries:
       urls:
         - https://github.com/castai/helm-charts/releases/download/castai-evictor-0.25.30/castai-evictor-0.25.30.tgz
       version: 0.25.30
+  castai-evictor-ext:
+    - apiVersion: v2
+      appVersion: v0.1.0
+      created: "2024-05-09T17:48:06.71691+03:00"
+      description: castai-evictor-ext.
+      digest: e687d27b6e17b0126c83858ee8b76605e2554c5da38a3b4f260c333afe1ee5b5
+      name: castai-evictor-ext
+      type: application
+      urls:
+        - https://github.com/castai/privatelink-aws/raw/helm-charts-test/charts/castai-evictor/charts/castai-evictor-ext/castai-evictor-ext-0.1.2.tgz
+      version: 0.1.2
 generated: "2024-05-08T09:40:41.636124147Z"
