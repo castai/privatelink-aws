@@ -57,7 +57,7 @@ image:
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: castai-evictor
+fullnameOverride: castai-evictor-ext
 
 rbac:
   enabled: true
