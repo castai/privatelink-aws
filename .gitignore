@@ -1,0 +1,6 @@
+.idea
+.terraform
+builds
+
+.DS_Store
+*.tfvars
