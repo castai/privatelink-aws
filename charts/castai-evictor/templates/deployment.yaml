@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "evictor.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.managedByCASTAI }}
+    charts.cast.ai/managed-by: cast.ai
+    {{ end }}
+    {{- include "evictor.labels" . | nindent 4 }}
+  {{ if gt (len .Values.commonAnnotations) 0 -}}
+  annotations:
+    {{- include "evictor.annotations" . | nindent 4 }}
+  {{- end }}
+spec:
+  strategy:
+    {{- .Values.updateStrategy | toYaml | nindent 4 }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "evictor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "evictor.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.hostNetwork.enabled }}
+      hostNetwork: true
+      {{- end }}
+      {{- if .Values.dnsPolicy }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "evictor.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          env:
+            - name: IN_CLUSTER
+              value: "true"
+            - name: LEADER_ELECTION_ENABLED
+              value: {{ .Values.leaderElection.enabled | quote }}
+            - name: LEADER_ELECTION_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DRY_RUN
+              value: {{ .Values.dryRun | quote }}
+            - name: AGGRESSIVE_MODE
+              value: {{ .Values.aggressiveMode | quote }}
+            - name: SCOPED_MODE
+              value: {{ .Values.scopedMode | quote }}
+            - name: NODE_GRACE_PERIOD_MINUTES
+              value: {{ .Values.nodeGracePeriodMinutes | quote }}
+            - name: MAX_TARGET_NODES_PER_CYCLE
+              value: {{ .Values.maxNodesToEvictPerCycle | quote }}
+            - name: EVICTION_SETTINGS_CONFIG_PATH
+              value: "/config/config.yaml"
+            - name: CYCLE_INTERVAL
+              value: {{ .Values.cycleInterval | quote }}
+            {{- range $name, $value := .Values.additionalEnv }}
+            - name: "{{ $name }}"
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+            - secretRef:
+                {{- if .Values.apiKeySecretRef }}
+                name: {{ .Values.apiKeySecretRef }}
+                {{- else }}
+                name: castai-cluster-controller
+                {{- end }}
+                optional: false
+            - configMapRef:
+                name: castai-cluster-controller
+                optional: false
+            - configMapRef:
+                name: {{ include "evictor.fullname" . }}-config
+                optional: false
+          {{/* we don't set resources if Cluster proportional vertical autoscaler is enabled */}}
+          resources:
+          {{- if .Values.clusterVPA.enabled -}}
+          {{/* we hardcode CPU req/limit for now */}}
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 1000m
+          {{- else -}}
+            {{ .Values.resources | toYaml | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          volumeMounts:
+            - mountPath: /config
+              name: cfg
+              readOnly: true
+      volumes:
+        - name: cfg
+          configMap:
+            name: {{ include "evictor.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

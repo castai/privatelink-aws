@@ -1,0 +1,157 @@
+# Default values for evictor.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# commonLabels -- Labels to add to all resources.
+commonLabels: {}
+
+# annotations - Annotations to add to all resources.
+commonAnnotations: {}
+
+# dryRyn -- Specifies whether the Evictor should run in dryRun mode (Read-Only).
+# if true, evictor will just log action(s) it would perform
+# instead of actually performing them.
+dryRun: false
+
+# aggressiveMode -- Specifies whether the Evictor can behave as aggressive
+# if true, evictor will start considering single replica pods
+# as long as they can be scheduled somewhere else.
+aggressiveMode: false
+
+# managedByCASTAI -- Specifies whether the Evictor was installed using mothership and is automatically updated by CAST AI.
+# Alternative scenarios are, when CAST AI is not managing charts, and customers' are install them with Argo CD/Terraform
+# or something else.
+managedByCASTAI: false
+
+# scopeMode -- Specifies whether the Evictor can behave in a scoped manner
+# if true, evictor will only evict nodes that are created by CAST AI.
+scopedMode: false
+
+# nodeGracePeriodMinutes -- Specifies the grace period after a node is created before it is considered for eviction
+# The number of minutes a node must exist before it will be considered.
+nodeGracePeriodMinutes: 5
+
+# maxNodesToEvictPerCycle -- Specifies the max nodes evictor can evict in a single cycle.
+maxNodesToEvictPerCycle: 20
+
+# cycleInterval -- Specifies the interval between eviction cycles. This property can be used to lower or raise the
+# frequency of the evictor's find-and-drain operations.
+cycleInterval: 1m
+
+# leaderElection -- Specifies leader election parameters.
+leaderElection:
+  # leaderElection.enabled -- Whether to enable leader election.
+  enabled: true
+
+# updateStrategy -- Controls `deployment.spec.strategy` field.
+updateStrategy:
+  type: Recreate
+
+image:
+  repository: us-docker.pkg.dev/castai-hub/library/evictor
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: castai-evictor
+
+rbac:
+  enabled: true
+
+serviceAccount:
+  # serviceAccount.create -- Specifies whether a service account should be created.
+  create: true
+  # serviceAccount.annotations -- Annotations to add to the service account.
+  annotations: {}
+  # serviceAccount.name -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template.
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+hostNetwork:
+  # hostNetwork.enabled -- Enable host networking.
+  enabled: false
+
+# dnsPolicy -- DNS Policy Override - Needed when using some custom CNI's.
+dnsPolicy: ""
+
+podSecurityContext:
+  readOnlyRootFilesystem: true
+
+# Pod security context.
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext:
+  runAsNonRoot: true
+  fsGroup: 1004
+  runAsGroup: 1004
+  runAsUser: 1004
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+  # Uncomment line below to force Evictor to run on master nodes (make sure to set up tolerations as well)
+  # node-role.kubernetes.io/master: ''
+
+tolerations: []
+  # uncomment the two lines below to support running on masters as well. If you desire to run ONLY on masters, check nodeSelector as well.
+  # - key: node-role.kubernetes.io/master
+  #  effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: NotIn
+              values:
+                - windows
+
+customConfig: {}
+configMapLabels: {}
+
+# additionalEnv -- Used to set any additional environment variables.
+additionalEnv: {}
+
+# apiKeySecretRef -- Name of secret with Token to be used for authorizing evictor access to the API
+# apiKey and apiKeySecretRef are mutually exclusive
+# The referenced secret must provide the token in .data["API_KEY"].
+apiKeySecretRef: ""
+
+# clusterVPA -- Cluster proportional vertical autoscaler for the evictor deployment
+# https://github.com/kubernetes-sigs/cluster-proportional-vertical-autoscaler.
+clusterVPA:
+  repository: "registry.k8s.io/cpa/cpvpa"
+  enabled: true
+  version: v0.8.4
+  pollPeriodSeconds: 300
+  resources: {}
+
+# Container security context.
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
