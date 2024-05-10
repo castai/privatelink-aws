@@ -5,6 +5,23 @@ entries:
         release-date: 2024-05-06T06:35:47
       apiVersion: v2
       appVersion: ddd7aef972169d70806b73d2cb495d17e17ba852
+      created: "2024-05-10T14:22:33.245194+03:00"
+      dependencies:
+        - condition: castai-evictor-ext.enabled
+          name: castai-evictor-ext
+          repository: file://charts/castai-evictor-ext
+          version: 0.1.4
+      description: Cluster utilization defragmentation tool
+      digest: 7768109a7da6666ea1e7ebf9b772f76f966d4b6900aa43cbfa3fd0f57ca4c8e6
+      name: castai-evictor
+      type: application
+      urls:
+        - https://github.com/castai/privatelink-aws/raw/helm-charts-test/charts/castai-evictor/castai-evictor-0.27.5.tgz
+      version: 0.27.5
+    - annotations:
+        release-date: 2024-05-06T06:35:47
+      apiVersion: v2
+      appVersion: ddd7aef972169d70806b73d2cb495d17e17ba852
       created: "2024-05-10T10:12:15.393229+03:00"
       dependencies:
         - condition: castai-evictor-ext.enabled
