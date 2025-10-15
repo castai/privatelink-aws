@@ -123,7 +123,7 @@ resource "aws_iam_instance_profile" "sample_vm_instance_profile" {
 resource "aws_instance" "sample_vm" {
   count                = var.enable_sample_vm ? 1 : 0
   ami                  = data.aws_ami.amazon_linux.id
-  instance_type        = "t2.micro"
+  instance_type        = var.sample_vm_instance_type
   iam_instance_profile = aws_iam_instance_profile.sample_vm_instance_profile[0].name
 
   network_interface {
@@ -145,7 +145,7 @@ resource "aws_vpc_endpoint" "endpoints" {
   for_each = toset(["ssm", "ssmmessages", "ec2messages"])
 
   vpc_id             = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
-  subnet_ids         = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
+  subnet_ids         = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
   security_group_ids = [aws_security_group.ssm_traffic.id]
 
   service_name        = "com.amazonaws.${var.region}.${each.key}"

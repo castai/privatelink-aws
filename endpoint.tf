@@ -20,7 +20,7 @@ resource "aws_vpc_endpoint" "cast_ai_rest_api" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.rest_api_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "cast_ai_grpc" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.grpc_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
@@ -46,7 +46,7 @@ resource "aws_vpc_endpoint" "cast_ai_api_grpc" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.api_grpc_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : data.aws_subnets.all_vpc_subnets.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
@@ -59,7 +59,33 @@ resource "aws_vpc_endpoint" "cast_ai_files" {
   vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
   service_name        = var.files_service_name
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = data.aws_subnets.all_vpc_subnets.ids
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
+  security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
+  private_dns_enabled = true
+
+  depends_on = [
+    module.vpc
+  ]
+}
+
+resource "aws_vpc_endpoint" "cast_ai_kvisor" {
+  vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
+  service_name        = var.kvisor_service_name
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
+  security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
+  private_dns_enabled = true
+
+  depends_on = [
+    module.vpc
+  ]
+}
+
+resource "aws_vpc_endpoint" "cast_ai_telemetry" {
+  vpc_id              = var.vpc_id == "" ? module.vpc[0].vpc_id : var.vpc_id
+  service_name        = var.telemetry_service_name
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = var.vpc_id == "" ? module.vpc[0].private_subnets : local.endpoint_subnet_ids
   security_group_ids  = [aws_security_group.cast_ai_vpc_service.id]
   private_dns_enabled = true
 
